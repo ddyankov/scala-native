@@ -2,8 +2,10 @@ package scala.scalanative
 package sbtplugin
 
 import sbt._, Keys._, complete.DefaultParsers._
-import scalanative.compiler.{Compiler => NativeCompiler, Opts => NativeOpts}
 import ScalaNativePlugin.autoImport._
+import scalanative.compiler.{Compiler => NativeCompiler,
+                             Opts => NativeOpts,
+                             Target => NativeTarget}
 
 object ScalaNativePluginInternal {
   private def cpToStrings(cp: Seq[File]): Seq[String] =
@@ -63,6 +65,8 @@ object ScalaNativePluginInternal {
 
     libraryDependencies += "org.scala-native" %% "rtlib" % nir.Versions.current,
 
+    nativeTarget := NativeTarget.current,
+
     nativeVerbose := false,
 
     nativeClang := {
@@ -92,7 +96,6 @@ object ScalaNativePluginInternal {
       val target    = (crossTarget in Compile).value
       val appll     = target / (moduleName.value + "-out.ll")
       val binary    = target / (moduleName.value + "-out")
-      val verbose   = nativeVerbose.value
       val clang     = nativeClang.value
       val clangOpts = nativeClangOptions.value
       val dotpath   = nativeEmitDependencyGraphPath.value
@@ -101,7 +104,8 @@ object ScalaNativePluginInternal {
                                      abs(appll),
                                      dotpath.map(abs),
                                      entry,
-                                     verbose)
+                                     nativeTarget.value,
+                                     nativeVerbose.value)
 
       IO.createDirectory(target)
       unpackRtlib(classpath)
