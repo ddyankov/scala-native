@@ -68,7 +68,8 @@ lazy val sbtplugin =
   project.in(file("sbtplugin")).
     settings(toolSettings).
     settings(
-      sbtPlugin := true
+      sbtPlugin := true,
+      addSbtPlugin("sh.den" % "sbt-cross-project" % "0.1-SNAPSHOT")
     ).
     dependsOn(tools)
 
